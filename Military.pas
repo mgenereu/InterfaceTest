@@ -8,7 +8,7 @@ type
     procedure Fire(const ADirection: String);
   end;
 
-  ILoadable = interface(IInterface)
+  ILoadable = interface
   ['{CE453C89-D415-4246-A8D4-3E8EF68B2AFC}']
     procedure LoadAmmo(const Count: Integer);
   end;
