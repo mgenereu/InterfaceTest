@@ -2,6 +2,7 @@ program InterfaceTest;
 
 {$APPTYPE CONSOLE}
 
+
 uses
   Military in 'Military.pas';
 
@@ -15,5 +16,6 @@ begin
   finally
     Military.Free;
   end;
+  ReadLn;
 
 end.

@@ -4,10 +4,12 @@ interface
 
 type
   IBlaster = interface
+    ['{1963A285-DD73-4926-8488-69A09457CCAF}']
     procedure Fire(const ADirection: String);
   end;
 
-  ILoadable = interface
+  ILoadable = interface(IInterface)
+  ['{CE453C89-D415-4246-A8D4-3E8EF68B2AFC}']
     procedure LoadAmmo(const Count: Integer);
   end;
 
@@ -31,14 +33,15 @@ type
 
   TMilitary = class
   strict private
-    FCannon: TCannon;
-    FCatapult: TCatapult;
+    FCannonBlaster: IBlaster;
+    FCannonLoadable: ILoadable;
+    FCatapultBlaster: IBlaster;
+    FCatapultLoadable: ILoadable;
   private
     procedure UseTheCannon;
     procedure UseTheCatapult;
   public
     constructor Create;
-    destructor Destroy; override;
     procedure KillTheEnemy;
   end;
 
@@ -56,7 +59,7 @@ type
     procedure Attack;
   end;
 
-  TSolderFourLoader = class
+  TSoldierFourLoader = class
   strict private
     FLoadable: ILoadable;
   public
@@ -64,7 +67,7 @@ type
     procedure Load;
   end;
 
-  TSolderOneLoader = class
+  TSoldierOneLoader = class
   strict private
     FLoadable: ILoadable;
   public
@@ -72,8 +75,7 @@ type
     procedure Load;
   end;
 
-type
-  TSoldierOneShooter = class
+  TSoldierTwoShooter = class
   strict private
     FBlaster: IBlaster;
   public
@@ -96,24 +98,24 @@ begin
   FBlaster.Fire('Up');
 end;
 
-constructor TSolderFourLoader.Create(ALoadable: ILoadable);
+constructor TSoldierFourLoader.Create(ALoadable: ILoadable);
 begin
   inherited Create;
   FLoadable := ALoadable;
 end;
 
-procedure TSolderFourLoader.Load;
+procedure TSoldierFourLoader.Load;
 begin
   FLoadable.LoadAmmo(4);
 end;
 
 procedure TMilitary.UseTheCannon;
 var
-  Loader: TSolderFourLoader;
+  Loader: TSoldierFourLoader;
   Shooter: TSoldierFiveShooter;
 begin
-  Loader := TSolderFourLoader.Create(FCannon);
-  Shooter := TSoldierFiveShooter.Create(FCannon);
+  Loader := TSoldierFourLoader.Create(FCannonLoadable);
+  Shooter := TSoldierFiveShooter.Create(FCannonBlaster);
   try
     Loader.Load;
     Shooter.Attack;
@@ -125,11 +127,11 @@ end;
 
 procedure TMilitary.UseTheCatapult;
 var
-  Loader: TSolderFourLoader;
-  Shooter: TSoldierFiveShooter;
+  Loader: TSoldierOneLoader;
+  Shooter: TSoldierTwoShooter;
 begin
-  Loader := TSolderFourLoader.Create(FCatapult);
-  Shooter := TSoldierFiveShooter.Create(FCatapult);
+  Loader := TSoldierOneLoader.Create(FCatapultLoadable);
+  Shooter := TSoldierTwoShooter.Create(FCatapultBlaster);
   try
     Loader.Load;
     Shooter.Attack;
@@ -140,17 +142,18 @@ begin
 end;
 
 constructor TMilitary.Create;
+var
+  LCannon: TCannon;
+  LCatapult: TCatapult;
 begin
   inherited Create;
-  FCannon := TCannon.Create();
-  FCatapult := TCatapult.Create();
-end;
+  LCannon := TCannon.Create();
+  FCannonLoadable := LCannon;
+  FCannonBlaster := LCannon;
 
-destructor TMilitary.Destroy;
-begin
-  FCatapult.Free;
-  FCannon.Free;
-  inherited Destroy;
+  LCatapult := TCatapult.Create();
+  FCatapultLoadable := LCatapult;
+  FCatapultBlaster := LCatapult;
 end;
 
 procedure TMilitary.KillTheEnemy;
@@ -158,7 +161,6 @@ begin
   UseTheCannon;
   UseTheCatapult;
   UseTheCannon;
-  ReadLn;
 end;
 
 constructor TCannon.Create;
@@ -211,30 +213,27 @@ begin
   WriteLn('Added: ' + Count.ToString);
 end;
 
-constructor TSolderOneLoader.Create(ALoadable: ILoadable);
+constructor TSoldierOneLoader.Create(ALoadable: ILoadable);
 begin
   inherited Create;
   FLoadable := ALoadable;
 end;
 
-procedure TSolderOneLoader.Load;
+procedure TSoldierOneLoader.Load;
 begin
   FLoadable.LoadAmmo(1);
 end;
 
-constructor TSoldierOneShooter.Create(ABlaster: IBlaster);
+constructor TSoldierTwoShooter.Create(ABlaster: IBlaster);
 begin
   inherited Create;
   FBlaster := ABlaster;
 end;
 
-procedure TSoldierOneShooter.Attack;
+procedure TSoldierTwoShooter.Attack;
 begin
   FBlaster.Fire('North');
   FBlaster.Fire('South');
-  FBlaster.Fire('East');
-  FBlaster.Fire('West');
-  FBlaster.Fire('Up');
 end;
 
 end.
